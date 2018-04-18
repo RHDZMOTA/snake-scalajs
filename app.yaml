@@ -1,0 +1,11 @@
+runtime: python27
+threadsafe: yes
+
+handlers:
+  - url: /
+    static_files: index.html
+    upload: index.html
+
+  - url: /target/scala-2.12
+    static_dir: target/scala-2.12
+
