@@ -6,9 +6,12 @@ import com.rhdzmota.games.snake.model._
 import org.scalajs.dom.ext.KeyCode
 import org.scalajs.dom.html.Canvas
 
+import com.rhdzmota.games.snake.jsUtil.canvas.ImplicitDrawingOps._
+import com.rhdzmota.games.snake.jsUtil.canvas.DrawingSyntax._
+
 object App {
 
-  var currentSnake: Option[Living] = None
+  var currentSnake: Option[Snake] = None
   var canvas: Option[Canvas] = None
   var nextMove: Movement = Down
 
@@ -18,15 +21,10 @@ object App {
     val xmax = (0.97 * dom.window.innerWidth).toInt
     val ymax = (0.97 * dom.window.innerHeight).toInt
     implicit val screenSize: ScreenSize = ScreenSize(0, xmax, 0, ymax)
-
-    val ctx = setup
+    implicit val ctx: dom.CanvasRenderingContext2D = setup
 
     currentSnake = Some(SnakeCreator.create())
-
-    drawCanvas(ctx)
-
-    scala.scalajs.js.timers.setInterval(50) {drawWrapper(ctx)}
-    //gameLoop(1000, snake, ctx)
+    scala.scalajs.js.timers.setInterval(30) {gameLoop}
 
   }
 
@@ -52,58 +50,25 @@ object App {
     canvas.get.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
   }
 
-  def drawCanvas(ctx: dom.CanvasRenderingContext2D)(implicit screenSize: ScreenSize): Unit = {
+  def drawCanvas(implicit screenSize: ScreenSize, ctx: dom.CanvasRenderingContext2D): Unit = {
     ctx.fillStyle = "black"
     ctx.fillRect(screenSize.xmin, screenSize.ymin, screenSize.xmax, screenSize.ymax)
   }
 
-  def drawSnake(snake: Snake, ctx: dom.CanvasRenderingContext2D): Unit = {
-    def drawSnakeUnit(pos: Position, color: String): Unit = {
-      ctx.fillStyle = color
-      ctx.fillRect(pos.x, pos.y, 10, 10)
-    }
-    snake match {
-      case survivor: Living => survivor.body.foreach(drawSnakeUnit(_, "white"))
-      case looser: Dead => looser.cadaver.foreach(drawSnakeUnit(_, "red"))
-    }
-  }
-
-  def drawFood(food: Food, ctx: dom.CanvasRenderingContext2D): Unit = {
-    ctx.fillStyle = "white"
-    ctx.fillRect(food.position.x, food.position.y, 10, 10)
-  }
-
-  def draw(snake: Snake, ctx: dom.CanvasRenderingContext2D)(implicit screenSize: ScreenSize): Snake = snake match {
-    case looser: Dead =>
-      drawCanvas(ctx)
-      drawSnake(looser, ctx)
-      looser
-    case survivor: Living =>
-      drawCanvas(ctx)
-      drawSnake(survivor, ctx)
-      drawFood(survivor.foodTarget, ctx)
-      survivor.move(nextMove)
-  }
-
-  def drawWrapper(ctx: dom.CanvasRenderingContext2D)(implicit screenSize: ScreenSize): Unit = {
-    currentSnake.map(draw(_, ctx) match {
+  def gameLoop(implicit screenSize: ScreenSize, ctx: dom.CanvasRenderingContext2D): Unit = currentSnake match {
+    case Some(snake) => snake match {
       case looser: Dead =>
-        currentSnake = None
+        drawCanvas
+        looser.draw
+        currentSnake = Some(looser)
       case survivor: Living =>
-        currentSnake = Some(survivor)
-    })
-
+        drawCanvas
+        survivor.draw
+        currentSnake = Some(survivor.move(nextMove))
+    }
+    case None => println("You shouldn't see this in the console.")
   }
 
-  def gameLoop(speed: Int, snake: Snake, ctx: dom.CanvasRenderingContext2D)(implicit screenSize: ScreenSize): Unit = snake match {
-    case looser: Dead => println(s"Game Over : ${looser}")
-    case survivor: Living =>
-      //Thread.sleep(speed)
-      drawCanvas(ctx)
-      println(survivor)
-      drawSnake(survivor, ctx)
-      drawFood(survivor.foodTarget, ctx)
-      gameLoop(speed, survivor.move(Right), ctx)
-  }
+
 
 }

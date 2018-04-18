@@ -9,11 +9,7 @@ trait Snake {
 
 case class Dead(cadaver: List[Position], age: Int, score: Int) extends Snake
 
-case class Living(
-                   body: List[Position],
-                   lastMovement: Movement,
-                   lastRelevantMovement: Movement,
-                   foodTarget: Food,
+case class Living(body: List[Position], lastMovement: Movement, lastRelevantMovement: Movement, foodTarget: Food,
                    age: Int, score: Int, moves: Int) extends Snake {
 
   def move(m: Movement)(implicit screenSize: ScreenSize): Snake = {
@@ -22,6 +18,7 @@ case class Living(
 
     if (moves == 0) Dead(body, age, score)
     else if (body contains nextPosition(fixedMovement)) Dead(body, age, score)
+    else if (!screenSize.contains(nextPosition(fixedMovement))) Dead(body, age, score)
     else if (eats(fixedMovement)) Living(nextPosition(fixedMovement) :: body, fixedMovement, lrm,
       Food(different = body), age + 1, score + foodTarget.value, SnakeCreator.availableMoves)
     else Living(nextPosition(fixedMovement) :: body.init, fixedMovement, lrm,
