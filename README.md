@@ -3,6 +3,7 @@
 A minimal snake-game implementation using scala-js.
 
 See a running demo [here](https://rhdzmota-snake-scalajs.appspot.com).
+**Note**: press enter to initialize game. 
 
 ## Requirements
 
@@ -16,7 +17,7 @@ Therefore, you can initialize the game by opening the `index.html`
 in any browser. 
 
 To re-compile the scala-code into javascript run: `sbt fastOpsJS`.
-Enable real time compilation by opining the sbt console `sbt` and
+Enable real time compilation by opening the sbt console `sbt` and
 typing in `~fastOpsJS`.
 
 ## Contributions and authors
