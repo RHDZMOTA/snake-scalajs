@@ -1461,7 +1461,8 @@ function $c_Lcom_rhdzmota_games_snake_App$() {
   $c_O.call(this);
   this.currentSnake$1 = null;
   this.canvas$1 = null;
-  this.nextMove$1 = null
+  this.nextMove$1 = null;
+  this.pauseOrRestart$1 = false
 }
 $c_Lcom_rhdzmota_games_snake_App$.prototype = new $h_O();
 $c_Lcom_rhdzmota_games_snake_App$.prototype.constructor = $c_Lcom_rhdzmota_games_snake_App$;
@@ -1484,20 +1485,26 @@ $c_Lcom_rhdzmota_games_snake_App$.prototype.setup__Lcom_rhdzmota_games_snake_mod
   }));
   return this.canvas$1.get__O().getContext("2d")
 });
-$c_Lcom_rhdzmota_games_snake_App$.prototype.drawCanvas__Lcom_rhdzmota_games_snake_model_ScreenSize__Lorg_scalajs_dom_raw_CanvasRenderingContext2D__V = (function(screenSize, ctx) {
-  ctx.fillStyle = "black";
-  ctx.fillRect(screenSize.xmin$1, screenSize.ymin$1, screenSize.xmax$1, screenSize.ymax$1)
-});
 $c_Lcom_rhdzmota_games_snake_App$.prototype.init___ = (function() {
   $n_Lcom_rhdzmota_games_snake_App$ = this;
   this.currentSnake$1 = $m_s_None$();
   this.canvas$1 = $m_s_None$();
   this.nextMove$1 = $m_Lcom_rhdzmota_games_snake_model_Down$();
+  this.pauseOrRestart$1 = true;
   return this
+});
+$c_Lcom_rhdzmota_games_snake_App$.prototype.drawCanvas__Lcom_rhdzmota_games_snake_model_ScreenSize__Lorg_scalajs_dom_raw_CanvasRenderingContext2D__V = (function(screenSize, ctx) {
+  ctx.fillStyle = "black";
+  ctx.fillRect(screenSize.xmin$1, screenSize.ymin$1, screenSize.xmax$1, screenSize.ymax$1)
 });
 $c_Lcom_rhdzmota_games_snake_App$.prototype.com$rhdzmota$games$snake$App$$$anonfun$setup$2__Lorg_scalajs_dom_raw_KeyboardEvent__O = (function(event) {
   var x1 = $uI(event.keyCode);
   switch (x1) {
+    case 13: {
+      $m_Lcom_rhdzmota_games_snake_App$().pauseOrRestart$1 = (!$m_Lcom_rhdzmota_games_snake_App$().pauseOrRestart$1);
+      return (void 0);
+      break
+    }
     case 40: {
       $m_Lcom_rhdzmota_games_snake_App$().nextMove$1 = $m_Lcom_rhdzmota_games_snake_model_Down$();
       return (void 0);
@@ -1559,11 +1566,46 @@ $c_Lcom_rhdzmota_games_snake_App$.prototype.main__AT__V = (function(args) {
   var screenSize = new $c_Lcom_rhdzmota_games_snake_model_ScreenSize().init___I__I__I__I(0, xmax, 0, ymax);
   var ctx = this.setup__Lcom_rhdzmota_games_snake_model_ScreenSize__Lorg_scalajs_dom_raw_CanvasRenderingContext2D(screenSize);
   this.currentSnake$1 = new $c_s_Some().init___O($m_Lcom_rhdzmota_games_snake_model_SnakeCreator$().create__Lcom_rhdzmota_games_snake_model_ScreenSize__Lcom_rhdzmota_games_snake_model_Living(screenSize));
-  $m_sjs_js_timers_package$().setInterval__D__F0__sjs_js_timers_SetIntervalHandle(30.0, new $c_sjsr_AnonFunction0().init___sjs_js_Function0((function($this, screenSize$1, ctx$1) {
+  this.drawCanvas__Lcom_rhdzmota_games_snake_model_ScreenSize__Lorg_scalajs_dom_raw_CanvasRenderingContext2D__V(screenSize, ctx);
+  var this$1 = this.currentSnake$1;
+  if ((!this$1.isEmpty__Z())) {
+    var arg1 = this$1.get__O();
+    var x$1 = $as_Lcom_rhdzmota_games_snake_model_Snake(arg1);
+    new $c_Lcom_rhdzmota_games_snake_jsUtil_canvas_DrawingSyntax$DrawingOps().init___O(x$1).draw__Lcom_rhdzmota_games_snake_jsUtil_canvas_ImplicitDrawing__Lorg_scalajs_dom_raw_CanvasRenderingContext2D__V($m_Lcom_rhdzmota_games_snake_jsUtil_canvas_ImplicitDrawingOps$ImplicitSnakeDrawing$(), ctx);
+    new $c_s_Some().init___O((void 0))
+  };
+  $m_sjs_js_timers_package$().setInterval__D__F0__sjs_js_timers_SetIntervalHandle(30.0, new $c_sjsr_AnonFunction0().init___sjs_js_Function0((function(this$2$1, screenSize$1, ctx$1) {
     return (function() {
-      $m_Lcom_rhdzmota_games_snake_App$().gameLoop__Lcom_rhdzmota_games_snake_model_ScreenSize__Lorg_scalajs_dom_raw_CanvasRenderingContext2D__V(screenSize$1, ctx$1)
+      $m_Lcom_rhdzmota_games_snake_App$().outerGameLoop__Lcom_rhdzmota_games_snake_model_ScreenSize__Lorg_scalajs_dom_raw_CanvasRenderingContext2D__V(screenSize$1, ctx$1)
     })
   })(this, screenSize, ctx)))
+});
+$c_Lcom_rhdzmota_games_snake_App$.prototype.outerGameLoop__Lcom_rhdzmota_games_snake_model_ScreenSize__Lorg_scalajs_dom_raw_CanvasRenderingContext2D__V = (function(screenSize, ctx) {
+  var x1 = this.pauseOrRestart$1;
+  if ((x1 === true)) {
+    var x1$2 = this.currentSnake$1;
+    if ($is_s_Some(x1$2)) {
+      var x2 = $as_s_Some(x1$2);
+      var snake = $as_Lcom_rhdzmota_games_snake_model_Snake(x2.value$2);
+      if ($is_Lcom_rhdzmota_games_snake_model_Dead(snake)) {
+        this.currentSnake$1 = new $c_s_Some().init___O($m_Lcom_rhdzmota_games_snake_model_SnakeCreator$().create__Lcom_rhdzmota_games_snake_model_ScreenSize__Lcom_rhdzmota_games_snake_model_Living(screenSize))
+      } else if ((!$is_Lcom_rhdzmota_games_snake_model_Living(snake))) {
+        throw new $c_s_MatchError().init___O(snake)
+      }
+    } else {
+      var x$2 = $m_s_None$();
+      if ((!(x$2 === x1$2))) {
+        throw new $c_s_MatchError().init___O(x1$2)
+      };
+      var this$2 = $m_s_Console$();
+      var this$3 = $as_Ljava_io_PrintStream(this$2.outVar$2.v$1);
+      this$3.java$lang$JSConsoleBasedPrintStream$$printString__T__V("You shouldn't see this in the console.\n")
+    }
+  } else if ((x1 === false)) {
+    this.gameLoop__Lcom_rhdzmota_games_snake_model_ScreenSize__Lorg_scalajs_dom_raw_CanvasRenderingContext2D__V(screenSize, ctx)
+  } else {
+    throw new $c_s_MatchError().init___O(x1)
+  }
 });
 var $d_Lcom_rhdzmota_games_snake_App$ = new $TypeData().initClass({
   Lcom_rhdzmota_games_snake_App$: 0
@@ -1706,7 +1748,7 @@ $c_Lcom_rhdzmota_games_snake_model_SnakeCreator$.prototype.initialX__Lcom_rhdzmo
   return ((screenSize.xmax$1 / 4) | 0)
 });
 $c_Lcom_rhdzmota_games_snake_model_SnakeCreator$.prototype.initialY__Lcom_rhdzmota_games_snake_model_ScreenSize__I = (function(screenSize) {
-  return (($imul(3, screenSize.ymax$1) / 4) | 0)
+  return ((screenSize.ymax$1 / 4) | 0)
 });
 $c_Lcom_rhdzmota_games_snake_model_SnakeCreator$.prototype.initialBody__Lcom_rhdzmota_games_snake_model_ScreenSize__sci_List = (function(screenSize) {
   $m_sci_IndexedSeq$();

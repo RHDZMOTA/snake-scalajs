@@ -1,7 +1,5 @@
 package com.rhdzmota.games.snake.model
 
-import javafx.scene.input.ScrollEvent.HorizontalTextScrollUnits
-
 trait Snake {
   def age: Int
   def score: Int
