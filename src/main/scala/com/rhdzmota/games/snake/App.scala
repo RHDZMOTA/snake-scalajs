@@ -14,6 +14,7 @@ object App {
   var currentSnake: Option[Snake] = None
   var canvas: Option[Canvas] = None
   var nextMove: Movement = Down
+  var pauseOrRestart: Boolean = true
 
   def main(args: Array[String]): Unit = {
 
@@ -24,7 +25,10 @@ object App {
     implicit val ctx: dom.CanvasRenderingContext2D = setup
 
     currentSnake = Some(SnakeCreator.create())
-    scala.scalajs.js.timers.setInterval(30) {gameLoop}
+    drawCanvas
+    currentSnake map {_.draw}
+
+    scala.scalajs.js.timers.setInterval(30) {outerGameLoop}
 
   }
 
@@ -39,6 +43,7 @@ object App {
     }
 
     dom.document.addEventListener("keydown", (event: dom.KeyboardEvent) => event.keyCode match {
+      case KeyCode.Enter => pauseOrRestart = !pauseOrRestart
       case KeyCode.Down  => nextMove = Down
       case KeyCode.Up => nextMove = Up
       case KeyCode.Right => nextMove = Right
@@ -69,6 +74,16 @@ object App {
     case None => println("You shouldn't see this in the console.")
   }
 
-
+  def outerGameLoop(implicit screenSize: ScreenSize, ctx: dom.CanvasRenderingContext2D): Unit = pauseOrRestart match {
+    case true => currentSnake match {
+      case Some(snake) => snake match {
+        case snake: Dead =>
+          currentSnake = Some(SnakeCreator.create())
+        case snake: Living => Unit
+      }
+      case None => println("You shouldn't see this in the console.")
+    }
+    case false => gameLoop
+  }
 
 }

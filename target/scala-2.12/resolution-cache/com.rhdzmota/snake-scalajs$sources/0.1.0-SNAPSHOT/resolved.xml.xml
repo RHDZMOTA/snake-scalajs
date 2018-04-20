@@ -4,7 +4,7 @@
 		module="snake-scalajs$sources"
 		revision="0.1.0-SNAPSHOT"
 		status="integration"
-		publication="20180418105125"
+		publication="20180420151853"
 	/>
 	<configurations>
 		<conf name="compile" visibility="public" description=""/>
